@@ -12,6 +12,8 @@ public abstract class EpisodeCleanupAlgorithmFactory {
                 return new APQueueCleanupAlgorithm();
             case UserPreferences.EPISODE_CLEANUP_NULL:
                 return new APNullCleanupAlgorithm();
+            case UserPreferences.EPISODE_CLEANUP_7DAY_AUTO_DELETE:
+                return new SevenDayAutoDeleteCleanupAlgorithm();
             default:
                 return new APCleanupAlgorithm(cleanupValue);
         }

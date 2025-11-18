@@ -74,6 +74,8 @@ public class AutomaticDeletionPreferencesFragment extends AnimatedPreferenceFrag
             int v = Integer.parseInt(values[x]);
             if (v == UserPreferences.EPISODE_CLEANUP_EXCEPT_FAVORITE) {
                 entries[x] =  res.getString(R.string.episode_cleanup_except_favorite_removal);
+            } else if (v == UserPreferences.EPISODE_CLEANUP_7DAY_AUTO_DELETE) {
+                entries[x] = res.getString(R.string.episode_cleanup_7day_auto_delete);
             } else if (v == UserPreferences.EPISODE_CLEANUP_QUEUE) {
                 entries[x] = res.getString(R.string.episode_cleanup_queue_removal);
             } else if (v == UserPreferences.EPISODE_CLEANUP_NULL) {

@@ -161,6 +161,7 @@
     <string name="feed_new_episodes_action_summary_autodownload">Automatic download enabled. Episodes are added to the inbox and then moved to the queue once downloaded.</string>
     <string name="episode_cleanup_never">Never</string>
     <string name="episode_cleanup_except_favorite_removal">When not favorited</string>
+    <string name="episode_cleanup_7day_auto_delete">After 7 days if not favorited</string>
     <string name="episode_cleanup_queue_removal">When not in queue</string>
     <string name="episode_cleanup_after_listening">After finishing</string>
     <plurals name="episode_cleanup_hours_after_listening">

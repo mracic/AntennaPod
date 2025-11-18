@@ -126,6 +126,7 @@ public abstract class UserPreferences {
     public static final int EPISODE_CLEANUP_QUEUE = -1;
     public static final int EPISODE_CLEANUP_NULL = -2;
     public static final int EPISODE_CLEANUP_EXCEPT_FAVORITE = -3;
+    public static final int EPISODE_CLEANUP_7DAY_AUTO_DELETE = -4;
     public static final int EPISODE_CLEANUP_DEFAULT = 0;
 
     // Constants
