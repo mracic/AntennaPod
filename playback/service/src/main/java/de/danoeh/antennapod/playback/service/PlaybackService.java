@@ -143,6 +143,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
     private static final String CUSTOM_ACTION_TOGGLE_SLEEP_TIMER =
             "action.de.danoeh.antennapod.core.service.toggleSleepTimer";
     public static final String CUSTOM_ACTION_NEXT_CHAPTER = "action.de.danoeh.antennapod.core.service.next_chapter";
+    private static final String CUSTOM_ACTION_TOGGLE_FAVORITE =
+            "action.de.danoeh.antennapod.core.service.toggleFavorite";
 
     /**
      * Set a max number of episodes to load for Android Auto, otherwise there could be performance issues
@@ -1410,6 +1412,24 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             );
         }
 
+        // Add favorite toggle for Android Auto
+        if (getPlayable() instanceof FeedMedia) {
+            FeedMedia media = (FeedMedia) getPlayable();
+            if (media.getItem() != null) {
+                boolean isFavorite = media.getItem().isTagged(FeedItem.TAG_FAVORITE);
+                @DrawableRes int icon = isFavorite ? R.drawable.ic_star : R.drawable.ic_star_border;
+                String label = isFavorite ? getString(R.string.remove_from_favorite_label)
+                        : getString(R.string.add_to_favorite_label);
+                sessionState.addCustomAction(
+                    new PlaybackStateCompat.CustomAction.Builder(
+                        CUSTOM_ACTION_TOGGLE_FAVORITE,
+                        label,
+                        icon
+                    ).build()
+                );
+            }
+        }
+
         WearMediaSession.mediaSessionSetExtraForWear(mediaSession);
 
         mediaSession.setPlaybackState(sessionState.build());
@@ -2072,6 +2092,15 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                     disableSleepTimer();
                 } else {
                     setSleepTimer(SleepTimerPreferences.timerMillisOrEpisodes());
+                }
+            } else if (CUSTOM_ACTION_TOGGLE_FAVORITE.equals(action)) {
+                if (mediaPlayer.getPlayable() instanceof FeedMedia) {
+                    FeedMedia media = (FeedMedia) mediaPlayer.getPlayable();
+                    if (media.getItem() != null) {
+                        DBWriter.toggleFavoriteItem(media.getItem());
+                        // Update the media session to reflect the new favorite state
+                        updateMediaSession();
+                    }
                 }
             }
         }

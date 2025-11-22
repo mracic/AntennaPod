@@ -3,8 +3,9 @@
 This document contains instructions for building and installing the modified AntennaPod application with the new features:
 
 1. **Episode Favorite Functionality** (already existed, enhanced documentation)
-2. **Auto-delete episodes not favorited within 7 days**
+2. **Auto-delete episodes not favorited within 7 days** ⭐ NEW
 3. **Auto-download for subscribed podcasts** (already existed, enhanced documentation)
+4. **Favorite toggle in Android Auto** ⭐ NEW
 
 ## Prerequisites
 
@@ -214,6 +215,56 @@ adb -s DEVICE_ID install app/build/outputs/apk/debug/app-debug.apk
 - **Episode Filter**: Set rules to only download episodes matching certain criteria (title contains, duration, etc.)
 - **Auto Download Queue**: Enable to auto-download episodes added to the queue
 
+### Feature 4: Favorite Toggle in Android Auto ⭐ NEW
+
+**What is this feature:**
+When using AntennaPod with Android Auto in your car, you can now favorite episodes directly from the Android Auto interface without touching your phone. The favorite button appears alongside other playback controls.
+
+**How to use:**
+
+1. **Connect to Android Auto:**
+   - Connect your phone to your car via USB cable or wireless Android Auto
+   - Your car's display should show the Android Auto interface
+
+2. **Access AntennaPod:**
+   - On the Android Auto home screen, select **AntennaPod**
+   - Or tap the media icon and select AntennaPod from available apps
+
+3. **Play an episode:**
+   - Browse your podcasts and select an episode to play
+   - The episode will start playing on your car's speakers
+
+4. **Toggle Favorite:**
+   - While an episode is playing, look for the custom action buttons around the play/pause button
+   - You'll see a **star icon** (⭐ or ☆)
+   - **Filled star** (⭐) = Episode is already favorited
+   - **Outlined star** (☆) = Episode is not favorited
+   - Tap the star icon to toggle the favorite status
+   - The icon will update immediately to reflect the new state
+
+**Where the button appears:**
+- On Android Auto, custom actions appear around the play button
+- The favorite toggle appears in the "additional actions" area or carousel
+- Position: Usually near left, near right, far left, far right, or in additional actions panel
+
+**Benefits:**
+- Mark episodes as favorites while driving (hands-free, eyes on road)
+- Protected episodes won't be auto-deleted even after 7 days
+- No need to pull over to mark important episodes
+- Syncs immediately with the main app
+
+**Important notes:**
+- The favorite button only appears when playing a podcast episode (not music or other audio)
+- Some car displays may show the button differently depending on screen size
+- The feature works on all Android Auto compatible vehicles
+- Also works with Android Auto on phone (standalone mode)
+
+**Testing without a car:**
+You can test Android Auto features without a car:
+1. Install **Android Auto** app from Google Play Store
+2. Open the app on your phone (Developer mode may need to be enabled)
+3. Or use Android Auto in Android Emulator
+
 ## Troubleshooting
 
 ### Build Issues
@@ -295,6 +346,33 @@ The following files were modified to implement the new features:
 6. **AutomaticDeletionPreferencesFragment.java**
    - `app/src/main/java/de/danoeh/antennapod/ui/screen/preferences/AutomaticDeletionPreferencesFragment.java`
    - Added UI handling for the new cleanup option
+
+7. **PlaybackService.java** (NEW - Android Auto)
+   - `playback/service/src/main/java/de/danoeh/antennapod/playback/service/PlaybackService.java`
+   - Added `CUSTOM_ACTION_TOGGLE_FAVORITE` constant
+   - Added favorite toggle button to media session for Android Auto
+   - Added handler for favorite toggle action
+   - Button dynamically shows filled/outlined star based on current favorite status
+
+### How the Android Auto Favorite Toggle Works Internally
+
+1. **Custom Action Registration** (in `updateMediaSession()` method):
+   - Checks if current playable is a `FeedMedia` instance
+   - Determines if episode is currently favorited using `FeedItem.TAG_FAVORITE`
+   - Selects appropriate icon: `ic_star` (filled) or `ic_star_border` (outlined)
+   - Adds custom action to `PlaybackStateCompat` which Android Auto displays
+
+2. **Action Handler** (in `onCustomAction()` callback):
+   - Receives action when user taps the favorite button in Android Auto
+   - Calls `DBWriter.toggleFavoriteItem()` to update database
+   - Calls `updateMediaSession()` to refresh the button state
+   - Icon updates immediately to reflect new favorite status
+
+3. **Integration Points:**
+   - Uses existing favorite infrastructure (DBWriter, FeedItem tags)
+   - Leverages MediaSessionCompat for Android Auto communication
+   - WearMediaSession adds Wear OS compatibility extras
+   - Works seamlessly with MediaBrowserServiceCompat
 
 ### How the 7-Day Auto-Delete Works Internally
 
